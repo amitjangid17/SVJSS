@@ -51,7 +51,7 @@ export function RegisterPage() {
             <Alert>
               <AlertDescription>
                 Your membership application has been submitted successfully. 
-                Our admin team will review your application and get back to you soon.
+                Our admin team will review your application, assign an appropriate membership type, and get back to you soon.
               </AlertDescription>
             </Alert>
             <Button 
@@ -83,7 +83,7 @@ export function RegisterPage() {
           <CardHeader>
             <CardTitle>Membership Application</CardTitle>
             <CardDescription>
-              Please provide accurate information for your membership application
+              Please provide accurate information for your membership application. Our admin team will review your application and assign an appropriate membership type.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -193,8 +193,16 @@ export function RegisterPage() {
                 />
               </div>
 
+              <Alert>
+                <AlertDescription>
+                  <strong>Important:</strong> All membership applications are reviewed by our admin team. 
+                  The admin will assign an appropriate membership type (Regular, Life, Student, Senior, or Honorary) based on your profile. 
+                  You will receive a confirmation email once your application has been processed.
+                </AlertDescription>
+              </Alert>
+
               <Button type="submit" className="w-full">
-                Submit Application
+                Submit Membership Application
               </Button>
             </form>
           </CardContent>

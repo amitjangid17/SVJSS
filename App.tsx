@@ -7,6 +7,9 @@ import { MemberDetailPage } from './components/pages/MemberDetailPage';
 import { RegisterPage } from './components/pages/RegisterPage';
 import { AdminLoginPage } from './components/pages/AdminLoginPage';
 import { AdminDashboardPage } from './components/pages/AdminDashboardPage';
+import { AddMemberPage } from './components/pages/AddMemberPage';
+import { UpdateRequestPage } from './components/pages/UpdateRequestPage';
+import { EditMemberPage } from './components/pages/EditMemberPage';
 
 function AppContent() {
   const { isAdmin, logout } = useApp();
@@ -38,8 +41,22 @@ function AppContent() {
             onNavigate={handleNavigation} 
           />
         );
+      case 'edit-member':
+        return (
+          <EditMemberPage 
+            memberId={selectedMemberId} 
+            onNavigate={handleNavigation} 
+          />
+        );
       case 'register':
         return <RegisterPage />;
+      case 'update-request':
+        return (
+          <UpdateRequestPage 
+            memberId={selectedMemberId || undefined}
+            onNavigate={handleNavigation} 
+          />
+        );
       case 'admin-login':
         return <AdminLoginPage onNavigate={handleNavigation} />;
       case 'admin':
@@ -48,6 +65,8 @@ function AppContent() {
         ) : (
           <AdminLoginPage onNavigate={handleNavigation} />
         );
+      case 'add-member':
+        return <AddMemberPage onNavigate={handleNavigation} />;
       default:
         return <HomePage onNavigate={handleNavigation} />;
     }
