@@ -91,15 +91,18 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
     setRejectionReason('');
   };
 
-  const handleDeleteMember = (memberId: string) => {
-    if (confirm('Are you sure you want to delete this member?')) {
+  const handleDeleteMember = (memberId: string, memberName: string) => {
+    if (confirm(`Are you sure you want to permanently delete ${memberName}? This action cannot be undone.`)) {
       deleteMember(memberId);
     }
   };
 
-  const handleToggleMemberStatus = (memberId: string, currentStatus: string) => {
+  const handleToggleMemberStatus = (memberId: string, currentStatus: string, memberName: string) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    updateMemberStatus(memberId, newStatus);
+    const action = newStatus === 'active' ? 'reactivate' : 'deactivate';
+    if (confirm(`Are you sure you want to ${action} ${memberName}?`)) {
+      updateMemberStatus(memberId, newStatus);
+    }
   };
 
   const toggleMemberLogExpansion = (memberId: string) => {
@@ -226,7 +229,7 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="requests">
               Membership ({stats.pendingRequests})
@@ -235,7 +238,6 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
               Updates ({stats.pendingUpdates})
             </TabsTrigger>
             <TabsTrigger value="members">Members</TabsTrigger>
-            <TabsTrigger value="manage">Manage</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -590,8 +592,15 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
             </div>
           </TabsContent>
 
-          {/* Members Tab with Individual Update Logs */}
+          {/* Members Tab with Individual Update Logs and Management Options */}
           <TabsContent value="members" className="space-y-6">
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                Member management actions (deactivate/delete) are permanent. Use caution when performing these operations.
+              </AlertDescription>
+            </Alert>
+            
             <div className="grid gap-4">
               {members.map((member) => {
                 const memberLogs = getMemberUpdateLogs(member.memberId);
@@ -637,6 +646,28 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
                             onClick={() => onNavigate('edit-member', member.id)}
                           >
                             <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleToggleMemberStatus(member.id, member.status, member.name)}
+                          >
+                            {member.status === 'active' ? (
+                              <>
+                                <UserMinus className="w-4 h-4" />
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="w-4 h-4" />
+                              </>
+                            )}
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleDeleteMember(member.id, member.name)}
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
@@ -727,66 +758,6 @@ export function AdminDashboardPage({ onNavigate }: AdminDashboardPageProps) {
                   </Card>
                 );
               })}
-            </div>
-          </TabsContent>
-
-          {/* Manage Tab */}
-          <TabsContent value="manage" className="space-y-6">
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                Use caution when managing member accounts. These actions cannot be undone.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="grid gap-4">
-              {members.map((member) => (
-                <Card key={member.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <Avatar>
-                          <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3>{member.name}</h3>
-                          <p className="text-sm text-muted-foreground">{member.email}</p>
-                          <p className="text-xs text-muted-foreground">{member.memberId}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={member.status === 'active' ? 'default' : 'secondary'}>
-                          {member.status}
-                        </Badge>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleToggleMemberStatus(member.id, member.status)}
-                        >
-                          {member.status === 'active' ? (
-                            <>
-                              <UserMinus className="w-4 h-4 mr-1" />
-                              Deactivate
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="w-4 h-4 mr-1" />
-                              Activate
-                            </>
-                          )}
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive"
-                          onClick={() => handleDeleteMember(member.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           </TabsContent>
         </Tabs>
